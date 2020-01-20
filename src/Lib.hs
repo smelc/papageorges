@@ -30,8 +30,7 @@ instance Show a => Show (PapaState a) where
 
 sort :: Ord a => PapaState a -> PapaState a
 sort PapaState{domain, previous, assignment, rng} =
-  PapaState (Data.List.sort domain) previous assignment' rng
-  where assignment' = sortBy (\(giver1, _) (giver2, _) -> compare giver1 giver2) assignment
+  PapaState (Data.List.sort domain) previous (sortOn fst assignment) rng
 
 presentLess :: Eq a => PapaState a -- ^ A state
               -> [a]               -- ^ The list of persons that weren't given a present yet
