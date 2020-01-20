@@ -13,13 +13,9 @@ homepage:       https://github.com/githubuser/papageorges#readme
 bug-reports:    https://github.com/githubuser/papageorges/issues
 author:         Author name here
 maintainer:     example@example.com
-copyright:      2019 Author name here
-license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
