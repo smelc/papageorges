@@ -23,6 +23,9 @@ data PapaState a = PapaState {
     , rng :: StdGen          -- ^ The random number generator
 }
 
+getPrevious :: PapaState a -> [[(a, a)]]
+getPrevious PapaState{previous} = previous
+
 instance Show a => Show (PapaState a) where
   show PapaState{domain, assignment} = "[" ++ intercalate "," domainStrs ++ "]\n" ++ intercalate "\n" assignStrs
     where domainStrs :: [String] = map show domain
@@ -42,15 +45,17 @@ notGiving PapaState{domain, assignment} = [x | x <- domain, x `notElem` map fst 
 
 assign0 :: Eq a => Show a => PapaState a -> PapaState a
 assign0 state =
-  let receiver = head job
-      dice = rng state
+  let dice = rng state
       (giverIndex, dice') = randomR (0, length candidateGivers - 1) dice
       assign = assignment state
       assign' = (candidateGivers !! giverIndex, receiver) : assign
       state'  = state { assignment = assign', rng = dice'}
       in state'
   where job = presentLess state
+        receiver = head job
         candidateGivers = notGiving state
+        allPrevious = concat $ getPrevious state
+        candidateGivers' = [x | x <- candidateGivers, (x, receiver) `notElem` allPrevious]
 
 assign :: Eq a => Show a => PapaState a -> PapaState a
 assign = until (null . presentLess) assign0
