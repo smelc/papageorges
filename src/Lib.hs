@@ -15,6 +15,7 @@ import System.Random
 -- State encoding that a list of person must give a gift to another person
 -- A person cannot give a gift to itself and two persons should not receive a gift
 -- from the same person
+-- TODO smelc Use the State monad to move rng out
 data PapaState a = PapaState {
     domain :: [a]            -- ^ The list of persons
     , previous :: [[(a, a)]] -- ^ Past assignments
