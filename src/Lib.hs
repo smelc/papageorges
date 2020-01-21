@@ -6,6 +6,7 @@
 
 module Lib where
 
+import Control.Exception
 import Control.Monad.Except
 import Control.Monad.State
 import Data.List
@@ -59,15 +60,14 @@ assign = until (null . presentLess) assign0
 
 data Where = Commercy | George
 
-getPreviousAssignments :: Where -> Either Error [[(String, String)]]
+getPreviousAssignments :: Where -> [[(String, String)]]
 getPreviousAssignments location =
   let
     result = past location
     lengths :: [Int] = map length result -- the lengths of past assignments, should all be the same
+    nbLengths = length lengths
   in
-    if length lengths > 1 -- TODO validate more stuff
-    then Left InvalidAssignments
-    else Right result
+    assert (0 == 1) result
   where
     past :: Where -> [[(String, String)]]
     past Commercy = [
@@ -78,24 +78,26 @@ getPreviousAssignments location =
        ("Marianne", "Romain"),
        ("Pascale", " Laura"),
        ("Romain", "Clement"),
+       ("Thomas", " Elise")
+      ],[
+       ("Marianne", "Romain"),
+       ("Pascale", " Laura"),
+       ("Romain", "Clement"),
        ("Thomas", " Elise")]
       ]
     past George = []
-
-data Error = InvalidAssignments
-  deriving Show
 
 getPersons :: Where -> [String]
 getPersons Commercy = ["Elise", "Clement", "Henry", "Pascale", "Marianne",
                        "Thomas", "Romain", "Laura"]
 getPersons George = []
 
-main0 :: StdGen -> Where -> Either Error (PapaState String)
-main0 g location = do
-  pastAssignments <- getPreviousAssignments location
-  let initialState = PapaState domain pastAssignments [] g
-      result = assign initialState
-  return $ Lib.sort result
+main0 :: StdGen -> Where -> PapaState String
+main0 g location =
+  let pastAssignments = getPreviousAssignments location
+      initialState = PapaState domain pastAssignments [] g
+      result = assign initialState in
+      Lib.sort result
   where
     domain = getPersons location
 
