@@ -53,11 +53,12 @@ assign0 state = do
         candidateGivers = [x | x <- notGiving state, (x, receiver) `notElem` allPrevious && x /= receiver]
 
 assign :: (Eq a, Show a) => StdGen -> PapaState a -> PapaState a
-assign rng state =
-  if null $ presentLess state
-  then state
-  else let (state', rng') = runState (assign0 state) rng in
-       assign rng' state'
+assign rng state = evalState (assign' state) rng
+  where
+    assign' :: (Eq a, Show a) => PapaState a -> State StdGen (PapaState a)
+    assign' state
+      | null (presentLess state) = return state
+      | otherwise = assign0 state >>= assign'
 
 data Where = Commercy | George
 
