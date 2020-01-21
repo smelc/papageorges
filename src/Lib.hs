@@ -29,14 +29,14 @@ instance Show a => Show (PapaState a) where
 
 assign0 :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
 assign0 state@PapaState{notGiving, presentLess=receiver:receivers, previous, assignment} = do
-  giver <- uniform (S.filter neverGaveToReceiver notGiving)
+  giver <- uniform (S.filter validGiver notGiving)
   return $ state
     { notGiving = S.delete giver notGiving
     , presentLess = receivers
     , assignment = (giver, receiver) : assignment
     }
  where
-  neverGaveToReceiver giver = S.notMember (giver, receiver) previous
+  validGiver giver = S.notMember (giver, receiver) previous && giver /= receiver
 
 assign :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
 assign state
