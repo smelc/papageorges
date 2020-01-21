@@ -9,8 +9,8 @@ module Lib where
 import Control.Exception
 import Data.List
 import Debug.Trace
-import System.Random
 import Control.Monad.Random.Lazy
+import Control.Monad.Trans.Maybe
 import qualified Data.Set as S
 
 -- State encoding that a list of person must give a gift to another person
@@ -27,21 +27,32 @@ instance Show a => Show (PapaState a) where
   show PapaState{assignment} =
     unlines [show giver ++ "->" ++ show receiver | (giver, receiver) <- assignment]
 
-assign0 :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
+assign0 :: (Ord a, Show a, MonadRandom m) => PapaState a -> MaybeT m (PapaState a)
 assign0 state@PapaState{notGiving, presentLess=receiver:receivers, previous, assignment} = do
-  giver <- uniform (S.filter validGiver notGiving)
-  return $ state
-    { notGiving = S.delete giver notGiving
-    , presentLess = receivers
-    , assignment = (giver, receiver) : assignment
-    }
+  if null validGivers
+    then mzero
+    else do
+      giver <- uniform (S.filter validGiver notGiving)
+      return $ state
+        { notGiving = S.delete giver notGiving
+        , presentLess = receivers
+        , assignment = (giver, receiver) : assignment
+        }
  where
+  validGivers = S.filter validGiver notGiving
   validGiver giver = S.notMember (giver, receiver) previous && giver /= receiver
 
-assign :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
+assign :: (Ord a, Show a, MonadRandom m) => PapaState a -> MaybeT m (PapaState a)
 assign state
   | null (presentLess state) = return state
   | otherwise = assign0 state >>= assign
+
+retryAssignUntilSuccess :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
+retryAssignUntilSuccess state = do
+  res <- runMaybeT (assign state)
+  case res of
+    Nothing -> retryAssignUntilSuccess state
+    Just sol -> return sol
 
 data Where = Commercy | George
 
@@ -74,7 +85,7 @@ getPersons George = []
 
 main0 :: MonadRandom m => Where -> m (PapaState String)
 main0 location =
-  assign $ PapaState
+  retryAssignUntilSuccess $ PapaState
     { notGiving = S.fromList people
     , presentLess = people
     , previous = getPreviousAssignments location
