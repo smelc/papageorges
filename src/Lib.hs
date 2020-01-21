@@ -11,6 +11,7 @@ import Control.Monad.State.Lazy
 import Data.List
 import Debug.Trace
 import System.Random
+import Control.Monad.Random.Lazy
 
 -- State encoding that a list of person must give a gift to another person
 -- A person cannot give a gift to itself and two persons should not receive a gift
@@ -38,27 +39,21 @@ notGiving :: Eq a => PapaState a -- ^ A state
            -> [a]                -- ^ The list of persons that do not give a present yet
 notGiving PapaState{domain, assignment} = [x | x <- domain, x `notElem` map fst assignment]
 
-assign0 :: (Eq a, Show a) => PapaState a -> State StdGen (PapaState a)
+assign0 :: (Eq a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
 assign0 state = do
-  dice <- get
-  let (giverIndex, dice') = randomR (0, length candidateGivers - 1) dice
-      assign = assignment state
+  giverIndex <- getRandomR (0, length candidateGivers - 1)
+  let assign = assignment state
       assign' = (candidateGivers !! giverIndex, receiver) : assign
-      state'  = state { assignment = assign' }
-  put dice'
-  return state'
+  return $ state { assignment = assign' }
   where job = presentLess state
         receiver = head job
         allPrevious = concat $ previous state
         candidateGivers = [x | x <- notGiving state, (x, receiver) `notElem` allPrevious && x /= receiver]
 
-assign :: (Eq a, Show a) => StdGen -> PapaState a -> PapaState a
-assign rng state = evalState (assign' state) rng
-  where
-    assign' :: (Eq a, Show a) => PapaState a -> State StdGen (PapaState a)
-    assign' state
-      | null (presentLess state) = return state
-      | otherwise = assign0 state >>= assign'
+assign :: (Eq a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
+assign state
+  | null (presentLess state) = return state
+  | otherwise = assign0 state >>= assign
 
 data Where = Commercy | George
 
@@ -89,9 +84,9 @@ getPersons Commercy = ["Elise", "Clement", "Henry", "Pascale", "Marianne",
                        "Thomas", "Romain", "Laura"]
 getPersons George = []
 
-main0 :: StdGen -> Where -> PapaState String
-main0 rng location =
-  Lib.sort $ assign rng initialState
+main0 :: MonadRandom m => Where -> m (PapaState String)
+main0 location =
+  Lib.sort <$> assign initialState
   where
     pastAssignments = getPreviousAssignments location
     domain = getPersons location
@@ -99,6 +94,5 @@ main0 rng location =
 
 entrypoint :: IO ()
 entrypoint = do
-    g :: StdGen <- newStdGen
-    print $ main0 g Commercy
+    print =<< main0 Commercy
     return ()

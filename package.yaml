@@ -25,6 +25,8 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - MonadRandom
 
 executables:
   papageorges-exe:
