@@ -51,9 +51,8 @@ assign0 state =
       in state'
   where job = presentLess state
         receiver = head job
-        candidateGivers = notGiving state
         allPrevious = concat $ previous state
-        candidateGivers' = [x | x <- candidateGivers, (x, receiver) `notElem` allPrevious]
+        candidateGivers = [x | x <- notGiving state, (x, receiver) `notElem` allPrevious]
 
 assign :: Eq a => Show a => PapaState a -> PapaState a
 assign = until (null . presentLess) assign0
@@ -65,9 +64,9 @@ getPreviousAssignments location =
   let
     result = past location
     lengths :: [Int] = map length result -- the lengths of past assignments, should all be the same
-    nbLengths = length lengths
+    nbLengths = trace (show $ length lengths) (length lengths)
   in
-    assert (0 == 1) result
+    assert (trace (show nbLengths) nbLengths <= 1) result
   where
     past :: Where -> [[(String, String)]]
     past Commercy = [
