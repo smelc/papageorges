@@ -50,7 +50,7 @@ assign0 state = do
   where job = presentLess state
         receiver = head job
         allPrevious = concat $ previous state
-        candidateGivers = [x | x <- notGiving state, (x, receiver) `notElem` allPrevious]
+        candidateGivers = [x | x <- notGiving state, (x, receiver) `notElem` allPrevious && x /= receiver]
 
 assign :: (Eq a, Show a) => StdGen -> PapaState a -> PapaState a
 assign rng state =
