@@ -64,9 +64,9 @@ getPreviousAssignments location =
   let
     result = past location
     lengths :: [Int] = map length result -- the lengths of past assignments, should all be the same
-    nbLengths = trace (show $ length lengths) (length lengths)
+    nbLengths = length lengths
   in
-    assert (trace (show nbLengths) nbLengths <= 1) result
+    assert (nbLengths <= 1) result
   where
     past :: Where -> [[(String, String)]]
     past Commercy = [
@@ -78,12 +78,7 @@ getPreviousAssignments location =
        ("Pascale", " Laura"),
        ("Romain", "Clement"),
        ("Thomas", " Elise")
-      ],[
-       ("Marianne", "Romain"),
-       ("Pascale", " Laura"),
-       ("Romain", "Clement"),
-       ("Thomas", " Elise")]
-      ]
+      ]]
     past George = []
 
 getPersons :: Where -> [String]
