@@ -32,7 +32,7 @@ assign0 state@PapaState{notGiving, presentLess=receiver:receivers, previous, ass
   if null validGivers
     then mzero
     else do
-      giver <- uniform (S.filter validGiver notGiving)
+      giver <- uniform validGivers
       return $ state
         { notGiving = S.delete giver notGiving
         , presentLess = receivers
