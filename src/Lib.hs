@@ -7,64 +7,52 @@
 module Lib where
 
 import Control.Exception
-import Control.Monad.State.Lazy
 import Data.List
 import Debug.Trace
 import System.Random
 import Control.Monad.Random.Lazy
+import qualified Data.Set as S
 
 -- State encoding that a list of person must give a gift to another person
 -- A person cannot give a gift to itself and two persons should not receive a gift
 -- from the same person
-data PapaState a = PapaState {
-    domain :: [a]            -- ^ The list of persons
-    , previous :: [[(a, a)]] -- ^ Past assignments
-    , assignment :: [(a, a)] -- ^ The assignment (who gives to who)
-}
+data PapaState a = PapaState
+  { notGiving :: S.Set a
+  , presentLess :: [a]
+  , previous :: S.Set (a, a)
+  , assignment :: [(a, a)]
+  }
 
 instance Show a => Show (PapaState a) where
-  show PapaState{domain, assignment} = "[" ++ intercalate "," domainStrs ++ "]\n" ++ intercalate "\n" assignStrs
-    where domainStrs :: [String] = map show domain
-          assignStrs :: [String] = map (\x -> show (fst x) ++ "->" ++ show (snd x)) assignment
+  show PapaState{assignment} =
+    unlines [show giver ++ "->" ++ show receiver | (giver, receiver) <- assignment]
 
-sort :: Ord a => PapaState a -> PapaState a
-sort PapaState{domain, previous, assignment} =
-  PapaState (Data.List.sort domain) previous (sortOn fst assignment)
+assign0 :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
+assign0 state@PapaState{notGiving, presentLess=receiver:receivers, previous, assignment} = do
+  giver <- uniform (S.filter validGiver notGiving)
+  return $ state
+    { notGiving = S.delete giver notGiving
+    , presentLess = receivers
+    , assignment = (giver, receiver) : assignment
+    }
+ where
+  validGiver giver = S.notMember (giver, receiver) previous && giver /= receiver
 
-presentLess :: Eq a => PapaState a -- ^ A state
-              -> [a]               -- ^ The list of persons that weren't given a present yet
-presentLess PapaState{domain, assignment} = [x | x <- domain, x `notElem` map snd assignment]
-
-notGiving :: Eq a => PapaState a -- ^ A state
-           -> [a]                -- ^ The list of persons that do not give a present yet
-notGiving PapaState{domain, assignment} = [x | x <- domain, x `notElem` map fst assignment]
-
-assign0 :: (Eq a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
-assign0 state = do
-  giverIndex <- getRandomR (0, length candidateGivers - 1)
-  let assign = assignment state
-      assign' = (candidateGivers !! giverIndex, receiver) : assign
-  return $ state { assignment = assign' }
-  where job = presentLess state
-        receiver = head job
-        allPrevious = concat $ previous state
-        candidateGivers = [x | x <- notGiving state, (x, receiver) `notElem` allPrevious && x /= receiver]
-
-assign :: (Eq a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
+assign :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
 assign state
   | null (presentLess state) = return state
   | otherwise = assign0 state >>= assign
 
 data Where = Commercy | George
 
-getPreviousAssignments :: Where -> [[(String, String)]]
+getPreviousAssignments :: Where -> S.Set (String, String)
 getPreviousAssignments location =
   let
     result = past location
     lengths :: [Int] = map length result -- the lengths of past assignments, should all be the same
     nbLengths = length lengths
   in
-    assert (nbLengths <= 1) result
+    assert (nbLengths <= 1) (S.fromList $ concat result)
   where
     past :: Where -> [[(String, String)]]
     past Commercy = [
@@ -86,13 +74,15 @@ getPersons George = []
 
 main0 :: MonadRandom m => Where -> m (PapaState String)
 main0 location =
-  Lib.sort <$> assign initialState
-  where
-    pastAssignments = getPreviousAssignments location
-    domain = getPersons location
-    initialState = PapaState domain pastAssignments []
+  assign $ PapaState
+    { notGiving = S.fromList people
+    , presentLess = people
+    , previous = getPreviousAssignments location
+    , assignment = []
+    }
+ where
+  people = getPersons location
 
 entrypoint :: IO ()
-entrypoint = do
-    print =<< main0 Commercy
-    return ()
+entrypoint =
+  print =<< main0 Commercy
