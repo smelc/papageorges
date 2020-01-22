@@ -29,15 +29,13 @@ instance Show a => Show (PapaState a) where
 
 assign0 :: (Ord a, Show a, MonadRandom m) => PapaState a -> MaybeT m (PapaState a)
 assign0 state@PapaState{notGiving, presentLess=receiver:receivers, previous, assignment} = do
-  if null validGivers
-    then mzero
-    else do
-      giver <- uniform validGivers
-      return $ state
-        { notGiving = S.delete giver notGiving
-        , presentLess = receivers
-        , assignment = (giver, receiver) : assignment
-        }
+  guard $ not (null validGivers)
+  giver <- uniform validGivers
+  return $ state
+    { notGiving = S.delete giver notGiving
+    , presentLess = receivers
+    , assignment = (giver, receiver) : assignment
+    }
  where
   validGivers = S.filter validGiver notGiving
   validGiver giver = S.notMember (giver, receiver) previous && giver /= receiver
