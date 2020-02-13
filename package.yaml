@@ -26,8 +26,10 @@ library:
   dependencies:
   - MonadRandom
   - containers
+  - directory
   - transformers
   - mtl
+  - time
 
 executables:
   papageorges-exe:

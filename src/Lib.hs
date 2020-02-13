@@ -8,9 +8,12 @@ module Lib where
 
 import Control.Exception
 import Data.List
+import Data.Time
 import Debug.Trace
 import Control.Monad.Random.Lazy
 import Control.Monad.Trans.Maybe
+import System.Directory
+
 import qualified Data.Set as S
 
 -- State encoding that a list of person must give a gift to another person
@@ -92,6 +95,25 @@ main0 location =
  where
   people = getPersons location
 
+writeGiveToFile :: Int -- year
+                -> String -- giver
+                -> String -- given to
+                -> IO ()
+writeGiveToFile year giver recipient = do
+  let yearString = show year
+      directory = "resultats-" ++ yearString
+      filepath = (directory ++ "/" ++ giver ++ " donnes à.txt")
+  createDirectoryIfMissing False directory
+  writeFile filepath recipient
+  putStrLn $ "Written " ++ filepath
+
 entrypoint :: IO ()
-entrypoint =
-  print =<< main0 Commercy
+entrypoint = do
+  state :: PapaState String <- main0 Commercy
+  c :: UTCTime <- getCurrentTime
+  let (y, _, _) = toGregorian $ utctDay c -- (2009,4,21)
+      y' :: Int = fromIntegral y
+      writeGiveToFile' y p = writeGiveToFile y (fst p) (snd p)
+      effects :: [IO()] = map (writeGiveToFile' y') (assignment state)
+  sequence_ effects
+  -- print state do not leak result to standard output
