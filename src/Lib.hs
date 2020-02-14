@@ -61,13 +61,22 @@ getPreviousAssignments :: Where -> S.Set (String, String)
 getPreviousAssignments location =
   let
     result = past location
-    lengths :: [Int] = map length result -- the lengths of past assignments, should all be the same
+    lengths :: S.Set Int = S.fromList $ map length result -- the lengths of past assignments, should all be the same
     nbLengths = length lengths
   in
     assert (nbLengths <= 1) (S.fromList $ concat result)
   where
     past :: Where -> [[(String, String)]]
     past Commercy = [
+      [("Clement", "Elise"), -- Conjoint contrainte
+       ("Henry", " Pascale"),
+       ("Elise", "Clement"),
+       ("Laura", " Romain"),
+       ("Marianne", "Thomas"),
+       ("Pascale", " Henry"),
+       ("Romain", "Laura"),
+       ("Thomas", " Marianne")
+      ],
       [("Clement", "Thomas"), -- 2019
        ("Henry", " Marianne"),
        ("Elise", "Pascale"),
