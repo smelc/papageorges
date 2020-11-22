@@ -85,7 +85,6 @@ getPreviousAssignments location =
           ("Thomas", " Elise")
         ]
       ]
-    -- rajouter Jean Damien et Annabelle
     past George =
       [ [ ("Alice", "Helene"),
           ("Angelique", "Elisabeth"),
@@ -93,10 +92,12 @@ getPreviousAssignments location =
           ("Elisabeth", "Nathalie"),
           ("Elise", "Angelique"),
           ("Helene", "Maie"),
-          ("Natalie", "AUdrey"),
+          ("Nathalie", "AUdrey"),
           ("Maie", "Elise"),
           ("Perrine", "Sandrine"),
-          ("Sandrine", "Perrine")
+          ("Sandrine", "Perrine"),
+          ("JeanDamien", "Annabelle"), -- fake, added in 2020
+          ("Annabelle", "Annabelle") -- fake added in 2020
         ]
       ]
 
@@ -111,7 +112,20 @@ getPersons Commercy =
     "Romain",
     "Laura"
   ]
-getPersons George = []
+getPersons George =
+  [ "Annabelle",
+    "Alice",
+    "Angelique",
+    "Audrey",
+    "Elisabeth",
+    "Elise",
+    "Helene",
+    "JeanDamien",
+    "Maie",
+    "Nathalie",
+    "Perrine",
+    "Sandrine"
+  ]
 
 main0 :: MonadRandom m => Where -> m (PapaState String)
 main0 location =
@@ -131,12 +145,13 @@ writeGiveToFile ::
   String -> -- given to
   IO ()
 writeGiveToFile year giver recipient = do
-  let yearString = show year
-      directory = "resultats-" ++ yearString
-      filepath = (directory ++ "/" ++ giver ++ " donnes à.txt")
   createDirectoryIfMissing False directory
   writeFile filepath recipient
   putStrLn $ "Written " ++ filepath
+  where
+    yearString = show year
+    directory = "resultats-" ++ yearString
+    filepath = directory ++ "/" ++ giver ++ " donnes à.txt"
 
 entrypoint :: IO ()
 entrypoint = do
