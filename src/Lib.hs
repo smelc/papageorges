@@ -9,10 +9,8 @@ module Lib where
 import Control.Exception
 import Control.Monad.Random.Lazy
 import Control.Monad.Trans.Maybe
-import Data.List
 import qualified Data.Set as S
 import Data.Time
-import Debug.Trace
 import System.Directory
 
 -- State encoding that a list of person must give a gift to another person
@@ -56,6 +54,7 @@ retryAssignUntilSuccess state = do
     Just sol -> return sol
 
 data Where = Commercy | George
+  deriving (Show)
 
 getPreviousAssignments :: Where -> S.Set (String, String)
 getPreviousAssignments location =
@@ -140,26 +139,28 @@ main0 location =
     people = getPersons location
 
 writeGiveToFile ::
+  Where ->
   Int -> -- year
   String -> -- giver
   String -> -- given to
   IO ()
-writeGiveToFile year giver recipient = do
+writeGiveToFile w year giver recipient = do
   createDirectoryIfMissing False directory
   writeFile filepath recipient
   putStrLn $ "Written " ++ filepath
   where
     yearString = show year
-    directory = "resultats-" ++ yearString
+    directory = "resultats-" ++ show w ++ "-" ++ yearString
     filepath = directory ++ "/" ++ giver ++ " donnes à.txt"
 
 entrypoint :: IO ()
 entrypoint = do
-  state :: PapaState String <- main0 Commercy
+  let w :: Where = Commercy
+  state :: PapaState String <- main0 w
   c :: UTCTime <- getCurrentTime
   let (y, _, _) = toGregorian $ utctDay c -- (2009,4,21)
       y' :: Int = fromIntegral y
-      writeGiveToFile' y p = writeGiveToFile y (fst p) (snd p)
+      writeGiveToFile' y p = writeGiveToFile w y (fst p) (snd p)
       effects :: [IO ()] = map (writeGiveToFile' y') (assignment state)
   sequence_ effects
 
