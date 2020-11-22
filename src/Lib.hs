@@ -86,7 +86,18 @@ getPreviousAssignments location =
        ("Romain", "Clement"),
        ("Thomas", " Elise")
       ]]
-    past George = []
+      -- rajouter Jean Damien et Annabelle
+    past George = [
+      [("Alice", "Helene"),
+       ("Angelique", "Elisabeth"),
+       ("Audrey", "Alice"),
+       ("Elisabeth", "Nathalie"),
+       ("Elise", "Angelique"),
+       ("Helene", "Maie"),
+       ("Natalie", "AUdrey"),
+       ("Maie", "Elise"),
+       ("Perrine", "Sandrine"),
+       ("Sandrine", "Perrine")]]
 
 getPersons :: Where -> [String]
 getPersons Commercy = ["Elise", "Clement", "Henry", "Pascale", "Marianne",
