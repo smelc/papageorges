@@ -85,18 +85,33 @@ getPreviousAssignments location =
         ]
       ]
     past George =
-      [ [ ("Alice", "Helene"),
+      [ -- 2019
+        [ ("Alice", "Helene"),
           ("Angelique", "Elisabeth"),
           ("Audrey", "Alice"),
           ("Elisabeth", "Nathalie"),
           ("Elise", "Angelique"),
           ("Helene", "Maie"),
-          ("Nathalie", "AUdrey"),
+          ("Nathalie", "Audrey"),
           ("Maie", "Elise"),
           ("Perrine", "Sandrine"),
           ("Sandrine", "Perrine"),
           ("JeanDamien", "Annabelle"), -- fake, added in 2020
           ("Annabelle", "Annabelle") -- fake added in 2020
+        ],
+        -- 2020
+        [ ("Alice", "Audrey"),
+          ("Angelique", "Helene"),
+          ("Annabelle", "Angelique"),
+          ("Audrey", "Sandrine"),
+          ("Elisabeth", "Perrine"),
+          ("Elise", "Elisabeth"),
+          ("Helene", "JeanDamien"),
+          ("JeanDamien", "Alice"),
+          ("Maie", "Nathalie"),
+          ("Nathalie", "Maie"),
+          ("Perrine", "Elise"),
+          ("Sandrine", "Annabelle")
         ]
       ]
 
@@ -150,12 +165,12 @@ writeGiveToFile w year giver recipient = do
   putStrLn $ "Written " ++ filepath
   where
     yearString = show year
-    directory = "resultats-" ++ show w ++ "-" ++ yearString
+    directory = "resultats-" ++ yearString ++ "-" ++ show w
     filepath = directory ++ "/" ++ giver ++ " donnes à.txt"
 
 entrypoint :: IO ()
 entrypoint = do
-  let w :: Where = Commercy
+  let w :: Where = George
   state :: PapaState String <- main0 w
   c :: UTCTime <- getCurrentTime
   let (y, _, _) = toGregorian $ utctDay c -- (2009,4,21)
