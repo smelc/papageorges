@@ -12,6 +12,7 @@ import Control.Monad.Trans.Maybe
 import qualified Data.Set as S
 import Data.Time
 import System.Directory
+import qualified System.Exit as Exit
 
 -- State encoding that a list of person must give a gift to another person
 -- A person cannot give a gift to itself and two persons should not receive a gift
@@ -161,12 +162,18 @@ writeGiveToFile ::
   IO ()
 writeGiveToFile w year giver recipient = do
   createDirectoryIfMissing False directory
+  fileExist <- doesFileExist filepath
+  when fileExist $ failWith $ "Not overwriting " ++ filepath
   writeFile filepath recipient
   putStrLn $ "Written " ++ filepath
   where
     yearString = show year
     directory = "resultats-" ++ yearString ++ "-" ++ show w
     filepath = directory ++ "/" ++ giver ++ " donnes à.txt"
+    failWith :: String -> IO () = \msg ->
+      do
+        putStrLn msg
+        Exit.exitWith $ Exit.ExitFailure 1
 
 entrypoint :: IO ()
 entrypoint = do
