@@ -1,6 +1,3 @@
+dist-newstyle/
 resultats-2020/
-
-.stack-work/
-stack.yaml.lock
-papageorges.cabal
 *~
