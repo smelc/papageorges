@@ -9,10 +9,13 @@ module Lib where
 import Control.Exception
 import Control.Monad.Random.Lazy
 import Control.Monad.Trans.Maybe
+import Data.List (intersperse)
 import qualified Data.Set as S
 import Data.Time
 import System.Directory
+import qualified System.Environment as Env
 import qualified System.Exit as Exit
+import System.IO (hPutStrLn, stderr)
 
 -- State encoding that a list of person must give a gift to another person
 -- A person cannot give a gift to itself and two persons should not receive a gift
@@ -166,10 +169,9 @@ main0 location =
 writeGiveToFile ::
   Where ->
   Int -> -- year
-  String -> -- giver
-  String -> -- given to
+  (String, String) -> -- giver, given to
   IO ()
-writeGiveToFile w year giver recipient = do
+writeGiveToFile w year (giver, recipient) = do
   createDirectoryIfMissing False directory
   fileExist <- doesFileExist filepath
   when fileExist $ failWith $ "Not overwriting " ++ filepath
@@ -184,15 +186,28 @@ writeGiveToFile w year giver recipient = do
         putStrLn msg
         Exit.exitWith $ Exit.ExitFailure 1
 
+parseArgs :: [String] -> Either String Where
+parseArgs ["Commercy"] = Right Commercy
+parseArgs ["Georges"] = Right George
+parseArgs _ = Left "Exactly one argument must be passed: \"Commercy\" or \"Georges\""
+
 entrypoint :: IO ()
 entrypoint = do
-  let w :: Where = George
+  w <- parseWhere
   state :: PapaState String <- main0 w
   c :: UTCTime <- getCurrentTime
   let (y, _, _) = toGregorian $ utctDay c -- (2009,4,21)
       y' :: Int = fromIntegral y
-      writeGiveToFile' y p = writeGiveToFile w y (fst p) (snd p)
-      effects :: [IO ()] = map (writeGiveToFile' y') (assignment state)
+      effects :: [IO ()] = map (writeGiveToFile w y') (assignment state)
   sequence_ effects
+  where
+    parseWhere :: IO Where = do
+      args <- Env.getArgs
+      case parseArgs args of
+        Left msg -> do
+          hPutStrLn stderr $ "Cannot parse command line arguments: " ++ msg
+          Exit.exitWith $ Exit.ExitFailure 1
+        Right r ->
+          return r
 
 -- print state do not leak result to standard output

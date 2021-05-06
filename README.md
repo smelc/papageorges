@@ -7,4 +7,4 @@ Uses `ghc 8.10.4`
 To execute:
 
 * `cabal build`
-* `cabal exec papageorges-exe`
+* `cabal exec papageorges-exe -- Commercy`
