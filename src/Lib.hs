@@ -44,6 +44,7 @@ assign0 state@PapaState {notGiving, presentLess = receiver : receivers, previous
   where
     validGivers = S.filter validGiver notGiving
     validGiver giver = S.notMember (giver, receiver) previous && giver /= receiver
+assign0 PapaState{presentLess=[]} = error "Should not happen"
 
 assign :: (Ord a, Show a, MonadRandom m) => PapaState a -> MaybeT m (PapaState a)
 assign state
@@ -57,7 +58,7 @@ retryAssignUntilSuccess state = do
     Nothing -> retryAssignUntilSuccess state
     Just sol -> return sol
 
-data Where = Commercy | George
+data Where = Commercy | Georges
   deriving (Show)
 
 getPreviousAssignments :: Where -> S.Set (String, String)
@@ -97,7 +98,7 @@ getPreviousAssignments location =
           ("Thomas", " Clement")
         ]
       ]
-    past George =
+    past Georges =
       [ -- 2019
         [ ("Alice", "Helene"),
           ("Angelique", "Elisabeth"),
@@ -108,9 +109,7 @@ getPreviousAssignments location =
           ("Nathalie", "Audrey"),
           ("Maie", "Elise"),
           ("Perrine", "Sandrine"),
-          ("Sandrine", "Perrine"),
-          ("JeanDamien", "Annabelle"), -- fake, added in 2020
-          ("Annabelle", "Annabelle") -- fake added in 2020
+          ("Sandrine", "Perrine")
         ],
         -- 2020
         [ ("Alice", "Audrey"),
@@ -139,15 +138,15 @@ getPersons Commercy =
     "Romain",
     "Laura"
   ]
-getPersons George =
-  [ "Annabelle",
+getPersons Georges =
+  [ -- "Annabelle",
     "Alice",
     "Angelique",
     "Audrey",
     "Elisabeth",
     "Elise",
     "Helene",
-    "JeanDamien",
+    -- "JeanDamien",
     "Maie",
     "Nathalie",
     "Perrine",
@@ -188,7 +187,7 @@ writeGiveToFile w year (giver, recipient) = do
 
 parseArgs :: [String] -> Either String Where
 parseArgs ["Commercy"] = Right Commercy
-parseArgs ["Georges"] = Right George
+parseArgs ["Georges"] = Right Georges
 parseArgs _ = Left "Exactly one argument must be passed: \"Commercy\" or \"Georges\""
 
 entrypoint :: IO ()
