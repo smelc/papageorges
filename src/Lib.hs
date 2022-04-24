@@ -71,40 +71,40 @@ getPreviousAssignments location =
     past :: Where -> [[(String, String)]]
     past Commercy =
       [ [ ("Clement", "Elise"), -- Conjoint contrainte
-          ("Henry", " Pascale"),
+          ("Henry", "Pascale"),
           ("Elise", "Clement"),
-          ("Laura", " Romain"),
+          ("Laura", "Romain"),
           ("Marianne", "Thomas"),
-          ("Pascale", " Henry"),
+          ("Pascale", "Henry"),
           ("Romain", "Laura"),
-          ("Thomas", " Marianne")
+          ("Thomas", "Marianne")
         ],
         [ ("Clement", "Thomas"), -- 2019
-          ("Henry", " Marianne"),
+          ("Henry", "Marianne"),
           ("Elise", "Pascale"),
-          ("Laura", " Henry"),
+          ("Laura", "Henry"),
           ("Marianne", "Romain"),
-          ("Pascale", " Laura"),
+          ("Pascale", "Laura"),
           ("Romain", "Clement"),
-          ("Thomas", " Elise")
+          ("Thomas", "Elise")
         ],
         [ ("Clement", "Laura"), -- 2020
-          ("Henry", " Romain"),
+          ("Henry", "Romain"),
           ("Elise", "Marianne"),
-          ("Laura", " Elise"),
+          ("Laura", "Elise"),
           ("Marianne", "Pascale"),
-          ("Pascale", " Thomas"),
+          ("Pascale", "Thomas"),
           ("Romain", "Henry"),
-          ("Thomas", " Clement")
+          ("Thomas", "Clement")
         ],
         [ ("Clement", "Henry"), -- 2021
-          ("Henry", " Clement"),
+          ("Henry", "Clement"),
           ("Elise", "Romain"),
-          ("Laura", " Marianne"),
+          ("Laura", "Marianne"),
           ("Marianne", "Laura"),
-          ("Pascale", " Thomas"),
+          ("Pascale", "Thomas"),
           ("Romain", "Pascale"),
-          ("Thomas", " Elise")
+          ("Thomas", "Elise")
         ]
       ]
     past Georges =
