@@ -188,7 +188,7 @@ writeGiveToFile w year (giver, recipient) = do
   where
     yearString = show year
     directory = "resultats-" ++ yearString ++ "-" ++ show w
-    filepath = directory ++ "/" ++ giver ++ " donnes à.txt"
+    filepath = directory ++ "/" ++ giver ++ " donne à.txt"
     failWith :: String -> IO () = \msg ->
       do
         putStrLn msg
