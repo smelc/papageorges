@@ -9,13 +9,14 @@ module Lib where
 import Control.Exception
 import Control.Monad.Random.Lazy
 import Control.Monad.Trans.Maybe
-import Data.List (intersperse)
+import Data.List (delete, intersperse)
 import qualified Data.Set as S
 import Data.Time
 import System.Directory
 import qualified System.Environment as Env
 import qualified System.Exit as Exit
 import System.IO (hPutStrLn, stderr)
+import System.Random.Shuffle
 
 -- State encoding that a list of person must give a gift to another person
 -- A person cannot give a gift to itself and two persons should not receive a gift
@@ -31,32 +32,26 @@ instance Show a => Show (PapaState a) where
   show PapaState {assignment} =
     unlines [show giver ++ "->" ++ show receiver | (giver, receiver) <- assignment]
 
-assign0 :: (Ord a, Show a, MonadRandom m) => PapaState a -> MaybeT m (PapaState a)
-assign0 state@PapaState {notGiving, presentLess = receiver : receivers, previous, assignment} = do
-  guard $ not (null validGivers)
-  giver <- uniform validGivers
-  return $
-    state
-      { notGiving = S.delete giver notGiving,
-        presentLess = receivers,
-        assignment = (giver, receiver) : assignment
-      }
-  where
-    validGivers = S.filter validGiver notGiving
-    validGiver giver = S.notMember (giver, receiver) previous && giver /= receiver
-assign0 PapaState{presentLess=[]} = error "Should not happen"
-
-assign :: (Ord a, Show a, MonadRandom m) => PapaState a -> MaybeT m (PapaState a)
-assign state
-  | null (presentLess state) = return state
-  | otherwise = assign0 state >>= assign
-
-retryAssignUntilSuccess :: (Ord a, Show a, MonadRandom m) => PapaState a -> m (PapaState a)
-retryAssignUntilSuccess state = do
-  res <- runMaybeT (assign state)
-  case res of
-    Nothing -> retryAssignUntilSuccess state
-    Just sol -> return sol
+pickAll :: (MonadRandom m) => PapaState String -> m (PapaState String)
+pickAll state@PapaState{notGiving, presentLess, previous, assignment} = do
+  pure $ assert ((S.size notGiving) == (length presentLess))
+  case null notGiving of
+    True -> return state -- We're done
+    False -> do
+      possibleGivers :: [String] <- shuffleM $ S.toList notGiving
+      case possibleGivers of
+        [] -> error "Impossible possibleGivers"
+        giver : _ -> do
+          let notGiving' :: S.Set String = S.delete giver notGiving
+              possibleReceivers = [p | p <- presentLess, (giver, p) `S.notMember` previous, (giver, p) `notElem` assignment]
+          possibleReceivers' <- shuffleM possibleReceivers
+          case possibleReceivers' of
+            [] -> error "Impossible possibleReceivers"
+            receiver : _ -> do
+              let presentLess' :: [String] = delete receiver presentLess
+                  assignment' = (giver, receiver) : assignment
+                  state' :: PapaState String = PapaState notGiving' presentLess' previous assignment'
+              pickAll state'
 
 data Where = Commercy | Georges
   deriving (Show)
@@ -123,6 +118,15 @@ getPreviousAssignments location =
           ("Pascale", "Marianne"),
           ("Romain", "Elise"),
           ("Thomas", "Romain")
+        ],
+        [ ("Clement", "Romain"), -- 2024
+          ("Elise", "Thomas"),
+          ("Henry", "Marianne"),
+          ("Laura", "Pascale"),
+          ("Marianne", "Elise"),
+          ("Pascale", "Laura"),
+          ("Romain", "Clement"),
+          ("Thomas", "Henry")
         ]
       ]
     past Georges =
@@ -182,7 +186,7 @@ getPersons Georges =
 
 main0 :: MonadRandom m => Where -> m (PapaState String)
 main0 location =
-  retryAssignUntilSuccess $
+  pickAll $
     PapaState
       { notGiving = S.fromList people,
         presentLess = people,
