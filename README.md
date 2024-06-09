@@ -14,11 +14,12 @@ To execute:
 First, install [ghcup](https://www.haskell.org/ghcup/) and [direnv](https://direnv.net/). Then do:
 
 ```shell
-for tool in cabal ghc
+for tool in cabal ghc hls
 do
   mkdir -p bin/$tool
 done
 
 ghcup install cabal --isolate $(pwd)/bin/cabal
 ghcup install ghc 9.8.2 --isolate $(pwd)/bin/ghc
+ghcup install hls --isolate $(pwd)/bin/hls
 ```
