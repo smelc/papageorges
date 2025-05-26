@@ -74,60 +74,69 @@ getPreviousAssignments location =
           ("Romain", "Laura"),
           ("Thomas", "Marianne")
         ],
-        [ ("Clement", "Thomas"), -- 2019
-          ("Henry", "Marianne"),
-          ("Elise", "Pascale"),
-          ("Laura", "Henry"),
-          ("Marianne", "Romain"),
-          ("Pascale", "Laura"),
-          ("Romain", "Clement"),
-          ("Thomas", "Elise")
-        ],
-        [ ("Clement", "Laura"), -- 2020
-          ("Henry", "Romain"),
-          ("Elise", "Marianne"),
-          ("Laura", "Elise"),
-          ("Marianne", "Pascale"),
-          ("Pascale", "Thomas"),
-          ("Romain", "Henry"),
-          ("Thomas", "Clement")
-        ],
-        [ ("Clement", "Henry"), -- 2021
-          ("Henry", "Clement"),
-          ("Elise", "Romain"),
-          ("Laura", "Marianne"),
-          ("Marianne", "Laura"),
-          ("Pascale", "Thomas"),
-          ("Romain", "Pascale"),
-          ("Thomas", "Elise")
-        ],
-        [ ("Clement", "Marianne"), -- 2022
-          ("Elise", "Laura"),
-          ("Henry", "Elise"),
-          ("Laura", "Clement"),
-          ("Marianne", "Henry"),
-          ("Pascale", "Romain"),
-          ("Romain", "Thomas"),
-          ("Thomas", "Pascale")
-        ],
-        [ ("Clement", "Pascale"), -- 2023
-          ("Elise", "Henry"),
-          ("Henry", "Laura"),
-          ("Laura", "Thomas"),
-          ("Marianne", "Clement"),
-          ("Pascale", "Marianne"),
-          ("Romain", "Elise"),
-          ("Thomas", "Romain")
-        ],
-        [ ("Clement", "Romain"), -- 2024
-          ("Elise", "Thomas"),
-          ("Henry", "Marianne"),
-          ("Laura", "Pascale"),
-          ("Marianne", "Elise"),
-          ("Pascale", "Laura"),
-          ("Romain", "Clement"),
-          ("Thomas", "Henry")
+        [ ("Clement", "Clement"), -- Contrainte soi-même
+          ("Henry", "Henry"),
+          ("Elise", "Elise"),
+          ("Laura", "Laura"),
+          ("Marianne", "Marianne"),
+          ("Pascale", "Pascale"),
+          ("Romain", "Romain"),
+          ("Thomas", "Thomas")
         ]
+        -- [ ("Clement", "Thomas"), -- 2019
+        --   ("Henry", "Marianne"),
+        --   ("Elise", "Pascale"),
+        --   ("Laura", "Henry"),
+        --   ("Marianne", "Romain"),
+        --   ("Pascale", "Laura"),
+        --   ("Romain", "Clement"),
+        --   ("Thomas", "Elise")
+        -- ],
+        -- [ ("Clement", "Laura"), -- 2020
+        --   ("Henry", "Romain"),
+        --   ("Elise", "Marianne"),
+        --   ("Laura", "Elise"),
+        --   ("Marianne", "Pascale"),
+        --   ("Pascale", "Thomas"),
+        --   ("Romain", "Henry"),
+        --   ("Thomas", "Clement")
+        -- ],
+        -- [ ("Clement", "Henry"), -- 2021
+        --   ("Henry", "Clement"),
+        --   ("Elise", "Romain"),
+        --   ("Laura", "Marianne"),
+        --   ("Marianne", "Laura"),
+        --   ("Pascale", "Thomas"),
+        --   ("Romain", "Pascale"),
+        --   ("Thomas", "Elise")
+        -- ],
+        -- [ ("Clement", "Marianne"), -- 2022
+        --   ("Elise", "Laura"),
+        --   ("Henry", "Elise"),
+        --   ("Laura", "Clement"),
+        --   ("Marianne", "Henry"),
+        --   ("Pascale", "Romain"),
+        --   ("Romain", "Thomas"),
+        --   ("Thomas", "Pascale")
+        -- ],
+        -- [ ("Clement", "Pascale"), -- 2023
+        --   ("Elise", "Henry"),
+        --   ("Henry", "Laura"),
+        --   ("Laura", "Thomas"),
+        --   ("Marianne", "Clement"),
+        --   ("Pascale", "Marianne"),
+        --   ("Romain", "Elise"),
+        --   ("Thomas", "Romain")
+        -- ],
+        -- [ ("Clement", "Romain"), -- 2024
+        --   ("Elise", "Thomas"),
+        --   ("Henry", "Marianne"),
+        --   ("Laura", "Pascale"),
+        --   ("Marianne", "Elise"),
+        --   ("Pascale", "Laura"),
+        --   ("Romain", "Clement"),
+        --   ("Thomas", "Henry")
+        -- ]
       ]
     past Georges =
       [ -- 2019
