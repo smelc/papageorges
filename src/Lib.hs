@@ -145,6 +145,15 @@ getPreviousAssignments location =
           ("Pascale", "Romain"),
           ("Romain", "Henry"),
           ("Thomas", "Pascale")
+        ],
+        [ ("Clement", "Romain"), -- 2026
+          ("Henry", "Clement"),
+          ("Elise", "Pascale"),
+          ("Laura", "Henry"),
+          ("Marianne", "Elise"),
+          ("Pascale", "Marianne"),
+          ("Romain", "Thomas"),
+          ("Thomas", "Laura")
         ]
       ]
     past Georges =
